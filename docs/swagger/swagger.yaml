@@ -1,0 +1,466 @@
+basePath: /api/v1
+definitions:
+  v1.SigninRequest:
+    properties:
+      email:
+        type: string
+      password:
+        type: string
+    required:
+    - email
+    - password
+    type: object
+  v1.SignupRequest:
+    properties:
+      accountPass:
+        type: string
+      confirmPass:
+        type: string
+      email:
+        type: string
+    required:
+    - accountPass
+    - confirmPass
+    - email
+    type: object
+  v1.TaskCreateRequest:
+    properties:
+      operator:
+        enum:
+        - LT
+        - LTE
+        - GT
+        - GTE
+        type: string
+      taskType:
+        enum:
+        - TICKER
+        - OTHER
+        type: string
+      token:
+        enum:
+        - BTC
+        - ETH
+        - EOS
+        type: string
+      warnPrice:
+        default: 0
+        type: number
+    required:
+    - operator
+    - taskType
+    - token
+    - warnPrice
+    type: object
+  v1.UserEditRequest:
+    properties:
+      name:
+        type: string
+    required:
+    - name
+    type: object
+  v1.UserPassRequest:
+    properties:
+      newPass:
+        type: string
+      oldPass:
+        type: string
+    required:
+    - newPass
+    - oldPass
+    type: object
+host: localhost:8000
+info:
+  contact:
+    email: jiangink.cn@gmail.com
+    name: Erik
+    url: http://ErikJiang.github.com
+  description: Market Monitor 简易API文档
+  license:
+    name: MIT
+    url: https://opensource.org/licenses/MIT
+  termsOfService: http://swagger.io/terms/
+  title: Market Monitor API
+  version: "1.0"
+paths:
+  /auth/signin:
+    post:
+      consumes:
+      - application/json
+      description: 通过邮箱密码登录账号
+      operationId: auth.signin
+      parameters:
+      - description: 账号登录请求参数
+        in: body
+        name: body
+        required: true
+        schema:
+          $ref: '#/definitions/v1.SigninRequest'
+          type: object
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: '{"status":200, "code": 2000001, msg:"请求处理成功"}'
+          schema:
+            type: string
+        "400":
+          description: '{"status":400, "code": 4000001, msg:"请求参数有误"}'
+          schema:
+            type: string
+        "401":
+          description: '{"status":401, "code": 4010001, msg:"账号或密码有误"}'
+          schema:
+            type: string
+        "500":
+          description: '{"status":500, "code": 5000001, msg:"服务器内部错误"}'
+          schema:
+            type: string
+      summary: 账号登录
+      tags:
+      - auth
+  /auth/signout:
+    post:
+      consumes:
+      - application/json
+      description: 用户账号注销
+      operationId: auth.signout
+      parameters:
+      - description: 认证 Token 值
+        in: header
+        name: Authorization
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: '{"status":200, "code": 2000001, msg:"请求处理成功"}'
+          schema:
+            type: string
+        "500":
+          description: '{"status":500, "code": 5000001, msg:"服务器内部错误"}'
+          schema:
+            type: string
+      summary: 账号注销
+      tags:
+      - auth
+  /auth/signup:
+    post:
+      consumes:
+      - application/json
+      description: 通过邮箱密码注册账号
+      operationId: auth.signup
+      parameters:
+      - description: 账号注册请求参数
+        in: body
+        name: body
+        required: true
+        schema:
+          $ref: '#/definitions/v1.SignupRequest'
+          type: object
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: '{"status":200, "code": 2000001, msg:"请求处理成功"}'
+          schema:
+            type: string
+        "400":
+          description: '{"status":400, "code": 4000001, msg:"请求参数有误"}'
+          schema:
+            type: string
+        "500":
+          description: '{"status":500, "code": 5000001, msg:"服务器内部错误"}'
+          schema:
+            type: string
+      summary: 账号注册
+      tags:
+      - auth
+  /task:
+    get:
+      consumes:
+      - application/json
+      description: 获取当前用户的任务列表
+      parameters:
+      - description: 认证 Token 值
+        in: header
+        name: Authorization
+        required: true
+        type: string
+      - description: 页码
+        in: query
+        name: page
+        type: integer
+      - description: 每页条数
+        in: query
+        name: pageSize
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: '{"status":200, "code": 2000001, msg:"请求处理成功"}'
+          schema:
+            type: string
+        "500":
+          description: '{"status":500, "code": 5000001, msg:"服务器内部错误"}'
+          schema:
+            type: string
+      summary: 获取任务列表
+      tags:
+      - task
+    post:
+      consumes:
+      - application/json
+      description: 当前用户添加新任务
+      parameters:
+      - description: 认证 Token 值
+        in: header
+        name: Authorization
+        required: true
+        type: string
+      - description: 创建任务请求参数
+        in: body
+        name: body
+        required: true
+        schema:
+          $ref: '#/definitions/v1.TaskCreateRequest'
+          type: object
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: '{"status":200, "code": 2000001, msg:"请求处理成功"}'
+          schema:
+            type: string
+        "400":
+          description: '{"status":400, "code": 4000001, msg:"请求参数有误"}'
+          schema:
+            type: string
+        "500":
+          description: '{"status":500, "code": 5000001, msg:"服务器内部错误"}'
+          schema:
+            type: string
+      summary: 添加新任务
+      tags:
+      - task
+  /task/{taskId}:
+    delete:
+      consumes:
+      - application/json
+      description: 当前用户删除任务
+      parameters:
+      - description: 认证 Token 值
+        in: header
+        name: Authorization
+        required: true
+        type: string
+      - description: 任务ID
+        in: path
+        name: taskId
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: '{"status":200, "code": 2000001, msg:"请求处理成功"}'
+          schema:
+            type: string
+        "500":
+          description: '{"status":500, "code": 5000001, msg:"服务器内部错误"}'
+          schema:
+            type: string
+      summary: 删除任务
+      tags:
+      - task
+    get:
+      consumes:
+      - application/json
+      description: 获取当前用户选中任务的明细信息
+      parameters:
+      - description: 认证 Token 值
+        in: header
+        name: Authorization
+        required: true
+        type: string
+      - description: 任务ID
+        in: path
+        name: taskId
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: '{"status":200, "code": 2000001, msg:"请求处理成功"}'
+          schema:
+            type: string
+        "500":
+          description: '{"status":500, "code": 5000001, msg:"服务器内部错误"}'
+          schema:
+            type: string
+      summary: 获取任务明细
+      tags:
+      - task
+    put:
+      consumes:
+      - application/json
+      description: 当前用户修改任务明细
+      parameters:
+      - description: 认证 Token 值
+        in: header
+        name: Authorization
+        required: true
+        type: string
+      - description: 任务ID
+        in: path
+        name: taskId
+        required: true
+        type: integer
+      - description: 修改任务请求参数
+        in: body
+        name: body
+        required: true
+        schema:
+          $ref: '#/definitions/v1.TaskCreateRequest'
+          type: object
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: '{"status":200, "code": 2000001, msg:"请求处理成功"}'
+          schema:
+            type: string
+        "400":
+          description: '{"status":400, "code": 4000001, msg:"请求参数有误"}'
+          schema:
+            type: string
+        "500":
+          description: '{"status":500, "code": 5000001, msg:"服务器内部错误"}'
+          schema:
+            type: string
+      summary: 修改任务
+      tags:
+      - task
+  /user:
+    get:
+      consumes:
+      - application/json
+      description: 获取当前登录用户基本信息
+      parameters:
+      - description: 认证 Token 值
+        in: header
+        name: Authorization
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: '{"status":200, "code": 2000001, msg:"请求处理成功"}'
+          schema:
+            type: string
+        "500":
+          description: '{"status":500, "code": 5000001, msg:"服务器内部错误"}'
+          schema:
+            type: string
+      summary: 获取用户信息
+      tags:
+      - user
+  /user/avatar:
+    patch:
+      consumes:
+      - multipart/form-data
+      description: 修改当前登录用户头像
+      parameters:
+      - description: 认证 Token 值
+        in: header
+        name: Authorization
+        required: true
+        type: string
+      - description: 用户头像请求参数
+        in: formData
+        name: avatar
+        required: true
+        type: file
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: '{"status":200, "code": 2000001, msg:"请求处理成功"}'
+          schema:
+            type: string
+        "500":
+          description: '{"status":500, "code": 5000001, msg:"服务器内部错误"}'
+          schema:
+            type: string
+      summary: 修改用户头像
+      tags:
+      - user
+  /user/name:
+    patch:
+      consumes:
+      - application/json
+      description: 修改当前登录用户昵称
+      parameters:
+      - description: 认证 Token 值
+        in: header
+        name: Authorization
+        required: true
+        type: string
+      - description: 修改用户名称请求参数
+        in: body
+        name: body
+        required: true
+        schema:
+          $ref: '#/definitions/v1.UserEditRequest'
+          type: object
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: '{"status":200, "code": 2000001, msg:"请求处理成功"}'
+          schema:
+            type: string
+        "500":
+          description: '{"status":500, "code": 5000001, msg:"服务器内部错误"}'
+          schema:
+            type: string
+      summary: 编辑用户昵称
+      tags:
+      - user
+  /user/pass:
+    patch:
+      consumes:
+      - application/json
+      description: 修改当前登录用户密码
+      parameters:
+      - description: 认证 Token 值
+        in: header
+        name: Authorization
+        required: true
+        type: string
+      - description: 修改用户密码请求参数
+        in: body
+        name: body
+        required: true
+        schema:
+          $ref: '#/definitions/v1.UserPassRequest'
+          type: object
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: '{"status":200, "code": 2000001, msg:"请求处理成功"}'
+          schema:
+            type: string
+        "500":
+          description: '{"status":500, "code": 5000001, msg:"服务器内部错误"}'
+          schema:
+            type: string
+      summary: 修改用户密码
+      tags:
+      - user
+swagger: "2.0"
